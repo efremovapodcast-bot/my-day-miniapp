@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="theme-color" content="#EAF8F5">
+  <title>Мой день</title>
+
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <style>
+    :root {
+      --mint: #42C8BE;
+      --mint-deep: #1FA99F;
+      --mint-soft: #DDF7F2;
+      --peach: #FFD9C9;
+      --peach-soft: #FFF1E9;
+      --cream: #FFFDF9;
+      --ink: #173334;
+      --muted: #718184;
+      --line: rgba(23, 51, 52, 0.08);
+      --shadow: 0 14px 38px rgba(42, 119, 113, 0.10);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      background:
+        radial-gradient(circle at 10% -8%, rgba(105, 218, 207, 0.48), transparent 32%),
+        radial-gradient(circle at 100% 10%, rgba(255, 185, 154, 0.46), transparent 34%),
+        #f6fbf9;
+      min-height: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Arial, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.42), rgba(255,255,255,.76));
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, textarea { font: inherit; }
+
+    button {
+      border: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app {
+      width: min(100%, 480px);
+      margin: 0 auto;
+      padding:
+        calc(18px + env(safe-area-inset-top))
+        16px
+        calc(36px + env(safe-area-inset-bottom));
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 22px;
+      border-radius: 32px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.92), rgba(237,251,248,.88));
+      border: 1px solid rgba(255,255,255,.92);
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 126px;
+      height: 126px;
+      border-radius: 50%;
+      right: -32px;
+      top: -26px;
+      background: linear-gradient(145deg, rgba(66,200,190,.28), rgba(255,217,201,.58));
+      filter: blur(1px);
+    }
+
+    .eyebrow {
+      position: relative;
+      z-index: 1;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      color: var(--mint-deep);
+      margin-bottom: 6px;
+    }
+
+    h1 {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-size: 32px;
+      line-height: 1.04;
+      letter-spacing: -0.035em;
+    }
+
+    .subtitle {
+      position: relative;
+      z-index: 1;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .date-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin-top: 16px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.78);
+      border: 1px solid var(--line);
+      color: #4a5b5d;
+      font-size: 13px;
+      font-weight: 650;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-card {
+      margin-top: 14px;
+      padding: 18px;
+      border-radius: var(--radius-xl);
+      background: rgba(255,255,255,.84);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,.92);
+      box-shadow: var(--shadow);
+    }
+
+    .section-card.focus {
+      background:
+        linear-gradient(145deg, rgba(224,249,245,.96), rgba(255,239,229,.88));
+    }
+
+    .section-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-title {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.02em;
+    }
+
+    .section-kicker {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 650;
+    }
+
+    .quote {
+      margin: 0 0 14px;
+      font-size: 18px;
+      line-height: 1.38;
+      font-weight: 740;
+      letter-spacing: -0.015em;
+    }
+
+    .question-box {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(255,255,255,.92);
+    }
+
+    .question-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      font-weight: 800;
+      color: var(--mint-deep);
+    }
+
+    .question-text {
+      margin: 0;
+      line-height: 1.45;
+      font-size: 15px;
+      font-weight: 650;
+    }
+
+
+    .section-progress {
+      margin: -2px 0 14px;
+      padding: 11px 12px;
+      border-radius: 16px;
+      background: rgba(248,252,251,.72);
+      border: 1px solid var(--line);
+    }
+
+    .section-progress-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .section-progress-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    .section-progress-percent {
+      font-size: 13px;
+      font-weight: 820;
+      color: var(--mint-deep);
+    }
+
+    .section-progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: rgba(31,169,159,.10);
+    }
+
+    .section-progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--mint), var(--mint-deep));
+      transition: width .2s ease;
+    }
+
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .check-item {
+      display: flex;
+      text-align: left;
+      align-items: center;
+      gap: 12px;
+      min-height: 54px;
+      padding: 11px 12px;
+      border-radius: var(--radius-md);
+      background: rgba(248,252,251,.86);
+      border: 1px solid var(--line);
+      transition: transform .16s ease, opacity .16s ease, background .16s ease;
+      user-select: none;
+    }
+
+    .check-item:active { transform: scale(.985); }
+
+    .check-item.done {
+      opacity: .62;
+      background: rgba(221,247,242,.74);
+    }
+
+    .fake-check {
+      flex: 0 0 25px;
+      width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      border: 1.5px solid rgba(31,169,159,.28);
+      background: #fff;
+      color: white;
+      transition: background .16s ease, border-color .16s ease;
+    }
+
+    .done .fake-check {
+      background: linear-gradient(145deg, var(--mint), var(--mint-deep));
+      border-color: transparent;
+    }
+
+    .fake-check svg {
+      width: 14px;
+      height: 14px;
+      opacity: 0;
+      transform: scale(.7);
+      transition: opacity .16s ease, transform .16s ease;
+    }
+
+    .done .fake-check svg {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .item-main {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .item-label {
+      display: block;
+      font-size: 15px;
+      font-weight: 650;
+      line-height: 1.3;
+    }
+
+    .item-meta {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .health-grid {
+      display: grid;
+      grid-template-columns: 1.08fr .92fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .water-card,
+    .progress-card {
+      min-height: 152px;
+      padding: 15px;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,.92);
+    }
+
+    .water-card {
+      background:
+        radial-gradient(circle at 80% 15%, rgba(255,255,255,.65), transparent 26%),
+        linear-gradient(145deg, #c9f1ec, #ebfbf8);
+    }
+
+    .progress-card {
+      background:
+        radial-gradient(circle at 75% 18%, rgba(255,255,255,.72), transparent 26%),
+        linear-gradient(145deg, #ffe2d3, #fff2ea);
+    }
+
+    .mini-label {
+      color: #3f6664;
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .water-total {
+      margin-top: 8px;
+      font-size: 30px;
+      line-height: 1;
+      font-weight: 820;
+      letter-spacing: -0.035em;
+    }
+
+    .water-goal {
+      margin-top: 5px;
+      color: #5e7475;
+      font-size: 12px;
+    }
+
+    .water-button {
+      width: 100%;
+      margin-top: 15px;
+      padding: 11px 12px;
+      border-radius: 15px;
+      color: #fff;
+      background: linear-gradient(145deg, #51d0c4, #20aca1);
+      box-shadow: 0 9px 20px rgba(31,169,159,.22);
+      font-weight: 800;
+      transition: transform .14s ease;
+    }
+
+    .water-button:active { transform: scale(.97); }
+
+    .ring {
+      --p: 0%;
+      width: 76px;
+      height: 76px;
+      margin: 8px auto 7px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: conic-gradient(var(--mint) var(--p), rgba(255,255,255,.58) 0);
+      position: relative;
+    }
+
+    .ring::after {
+      content: "";
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      background: rgba(255,253,249,.9);
+      position: absolute;
+    }
+
+    .ring span {
+      position: relative;
+      z-index: 1;
+      font-size: 15px;
+      font-weight: 820;
+    }
+
+    .progress-caption {
+      text-align: center;
+      font-size: 12px;
+      color: #6e6762;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 100px;
+      resize: vertical;
+      border: 1px solid var(--line);
+      outline: none;
+      border-radius: 17px;
+      padding: 13px 14px;
+      background: rgba(249,252,251,.9);
+      color: var(--ink);
+      line-height: 1.45;
+      transition: border-color .16s ease, box-shadow .16s ease;
+    }
+
+    textarea:focus {
+      border-color: rgba(31,169,159,.5);
+      box-shadow: 0 0 0 4px rgba(66,200,190,.10);
+    }
+
+    .money-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .money-box {
+      padding: 14px;
+      border-radius: 18px;
+      background: linear-gradient(145deg, #f1fbf8, #fff8f3);
+      border: 1px solid rgba(255,255,255,.92);
+    }
+
+    .money-label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 12px;
+      line-height: 1.35;
+      font-weight: 750;
+      color: var(--muted);
+    }
+
+    .money-input-wrap {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .money-input {
+      width: 100%;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: var(--ink);
+      font-size: 24px;
+      font-weight: 820;
+      letter-spacing: -0.03em;
+    }
+
+    .money-suffix {
+      font-size: 15px;
+      font-weight: 750;
+      color: var(--muted);
+    }
+
+    .field + .field { margin-top: 13px; }
+
+    .field-label {
+      display: block;
+      margin-bottom: 7px;
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .night-question {
+      margin-top: 14px;
+      padding: 15px;
+      border-radius: 19px;
+      background: linear-gradient(145deg, #fff0e7, #fff9f5);
+      border: 1px solid rgba(255,255,255,.9);
+    }
+
+    .night-question .question-label { color: #c67b5c; }
+
+    .footer-note {
+      margin: 18px 0 0;
+      text-align: center;
+      color: #8a999a;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .error-state {
+      min-height: 70vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .error-card {
+      width: min(100%, 420px);
+      text-align: center;
+      padding: 28px 22px;
+      border-radius: 28px;
+      background: rgba(255,255,255,.88);
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,.92);
+    }
+
+    .error-icon {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 14px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: linear-gradient(145deg, var(--mint-soft), var(--peach-soft));
+      font-size: 26px;
+    }
+
+    .error-card h2 {
+      margin: 0 0 8px;
+      font-size: 21px;
+    }
+
+    .error-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+
+    .section-title-actions { display:flex; align-items:center; gap:8px; }
+    .add-button { width:34px; height:34px; border-radius:12px; background:#fff; color:var(--mint-deep); font-size:21px; line-height:1; box-shadow:0 6px 16px rgba(42,119,113,.08); }
+    .check-item { padding-right:8px; }
+    .check-click { flex:0 0 25px; padding:0; background:transparent; }
+    .item-click { flex:1 1 auto; min-width:0; padding:0; background:transparent; color:inherit; text-align:left; }
+    .stat-button { flex:0 0 auto; padding:7px 9px; border-radius:10px; background:var(--mint-soft); color:var(--mint-deep); font-size:12px; font-weight:800; }
+    .more-button { flex:0 0 auto; width:28px; height:32px; padding:0; border-radius:10px; background:transparent; color:#879596; font-size:19px; }
+    .sport-note { margin-top:9px; padding:10px 12px; border-radius:14px; background:var(--peach-soft); color:#6f625d; font-size:12px; line-height:1.45; }
+    .empty-state { padding:16px; text-align:center; color:var(--muted); font-size:13px; border:1px dashed rgba(31,169,159,.18); border-radius:15px; }
+    .modal-backdrop { position:fixed; inset:0; z-index:50; display:none; align-items:flex-end; justify-content:center; padding:12px; background:rgba(16,34,35,.28); }
+    .modal-backdrop.open { display:flex; }
+    .sheet { width:min(100%,480px); max-height:86vh; overflow:auto; padding:18px; border-radius:28px 28px 20px 20px; background:#fbfffd; box-shadow:0 -12px 40px rgba(23,51,52,.16); }
+    .sheet-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; }
+    .sheet-title { font-size:19px; font-weight:800; }
+    .sheet-close { width:34px; height:34px; border-radius:12px; background:#eef7f5; color:var(--ink); font-size:18px; }
+    .form-label { display:block; margin:12px 0 7px; font-size:13px; font-weight:750; }
+    .text-input { width:100%; padding:12px 13px; border:1px solid var(--line); border-radius:14px; background:#fff; color:var(--ink); outline:none; }
+    .primary-button { width:100%; margin-top:16px; padding:13px; border-radius:15px; background:linear-gradient(145deg,var(--mint),var(--mint-deep)); color:#fff; font-weight:800; }
+    .danger-button { width:100%; margin-top:10px; padding:12px; border-radius:15px; background:#fff0ed; color:#b85f4e; font-weight:750; }
+    .option-grid { display:grid; grid-template-columns:1fr 1fr; gap:9px; }
+    .option-button { padding:12px; border:1px solid var(--line); border-radius:14px; background:#f5faf8; color:var(--ink); font-weight:650; text-align:left; }
+    .option-button.selected { background:var(--mint-soft); border-color:rgba(31,169,159,.28); color:var(--mint-deep); }
+    .stats-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .stat-card { padding:15px; border-radius:18px; background:#f4faf8; text-align:center; }
+    .stat-number { font-size:28px; font-weight:830; }
+    .stat-caption { margin-top:4px; color:var(--muted); font-size:12px; }
+    .breakdown { display:grid; gap:8px; margin-top:14px; }
+    .breakdown-row { display:flex; justify-content:space-between; gap:12px; padding:10px 12px; border:1px solid var(--line); border-radius:13px; background:#fff; font-size:13px; }
+    .sheet-note { margin-top:10px; color:var(--muted); font-size:12px; line-height:1.45; }
+
+    @media (max-width: 360px) {
+      .health-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 29px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { scroll-behavior: auto !important; transition: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <main id="root" class="app" aria-live="polite"></main>
+  <div id="modalBackdrop" class="modal-backdrop" aria-hidden="true"><div id="modalSheet" class="sheet"></div></div>
+
+  <script>
+    const tg = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp : null;
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.ready();
+      window.Telegram.WebApp.expand();
+    }
+
+    const root = document.getElementById("root");
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const modalSheet = document.getElementById("modalSheet");
+    const todayKey = new Date().toISOString().slice(0, 10);
+    const stateKey = "my-day-state:" + todayKey;
+    const configKey = "my-day-config";
+
+    let data = null;
+    let state = loadState();
+    let config = loadConfig();
+
+    function loadState() {
+      try {
+        return JSON.parse(localStorage.getItem(stateKey)) || { checked:{}, waterMl:0, fields:{}, sportSelected:[], planCustom:[], planOverrides:{}, planHidden:{} };
+      } catch (e) {
+        return { checked:{}, waterMl:0, fields:{}, sportSelected:[], planCustom:[], planOverrides:{}, planHidden:{} };
+      }
+    }
+
+    function loadConfig() {
+      try {
+        return JSON.parse(localStorage.getItem(configKey)) || { custom:{morning:[],medications:[],habits:[]}, overrides:{}, hidden:{} };
+      } catch (e) {
+        return { custom:{morning:[],medications:[],habits:[]}, overrides:{}, hidden:{} };
+      }
+    }
+
+    function normalizeStorage() {
+      state.checked ||= {}; state.fields ||= {}; state.sportSelected ||= []; state.planCustom ||= []; state.planOverrides ||= {}; state.planHidden ||= {};
+      config.custom ||= {morning:[],medications:[],habits:[]}; config.custom.morning ||= []; config.custom.medications ||= []; config.custom.habits ||= [];
+      config.overrides ||= {}; config.hidden ||= {};
+    }
+    normalizeStorage();
+
+    function saveState(){ localStorage.setItem(stateKey, JSON.stringify(state)); }
+    function saveConfig(){ localStorage.setItem(configKey, JSON.stringify(config)); }
+
+    function dayIndex(length, salt=0){ const d=new Date(); return Math.abs(d.getFullYear()*10000+(d.getMonth()+1)*100+d.getDate()+salt)%length; }
+    function formatDate(){ return new Intl.DateTimeFormat("ru-RU",{weekday:"long",day:"numeric",month:"long"}).format(new Date()); }
+    function escapeHtml(value=""){ return String(value).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"); }
+    function checkIcon(){ return `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12.5 9.3 17 19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`; }
+
+    function baseItems(section){
+      if(section==="morning") return data.morning.items;
+      if(section==="medications") return data.health.medications;
+      if(section==="plan") return data.plan.items;
+      if(section==="habits") return data.habits.items;
+      return [];
+    }
+
+    function getItems(section){
+      if(section==="plan"){
+        const base = baseItems(section).filter(x=>!state.planHidden[x.id]).map(x=>({...x,...(state.planOverrides[x.id]||{})}));
+        return [...base,...state.planCustom];
+      }
+      const base = baseItems(section).filter(x=>!config.hidden[section+":"+x.id]).map(x=>({...x,...(config.overrides[section+":"+x.id]||{})}));
+      return [...base,...(config.custom[section]||[])];
+    }
+
+    function findItem(section,id){ return getItems(section).find(x=>x.id===id); }
+    function itemKey(section,id){ return section+":"+id; }
+    function isDone(section,id){
+      if(section==="morning" && id==="sport") return (state.sportSelected||[]).length>0;
+      return !!state.checked[itemKey(section,id)];
+    }
+    function groupProgress(section){ const items=getItems(section); if(!items.length) return 0; return Math.round(items.filter(x=>isDone(section,x.id)).length/items.length*100); }
+    function statValue(item,section,days){ const base=days===7?(item.stats7Base||0):(item.stats30Base||0); return Math.min(days,base+(isDone(section,item.id)?1:0)); }
+
+    function renderSectionProgress(section){
+      const p=groupProgress(section);
+      return `<div class="section-progress"><div class="section-progress-top"><span class="section-progress-label">Выполнено</span><span class="section-progress-percent">${p}%</span></div><div class="section-progress-track"><div class="section-progress-fill" style="width:${p}%"></div></div></div>`;
+    }
+
+    function renderItem(item,section){
+      const done=isDone(section,item.id);
+      const meta=item.time?`<span class="item-meta">${escapeHtml(item.time)}</span>`:"";
+      const showStats=section!=="plan";
+      return `<div class="check-item ${done?"done":""}">
+        <button class="check-click" data-toggle="${section}|${escapeHtml(item.id)}" type="button"><span class="fake-check">${checkIcon()}</span></button>
+        <button class="item-click" data-toggle="${section}|${escapeHtml(item.id)}" type="button"><span class="item-label">${escapeHtml(item.label)}</span>${meta}</button>
+        ${showStats?`<button class="stat-button" data-stats="${section}|${escapeHtml(item.id)}" type="button">${statValue(item,section,7)}/7</button>`:""}
+        <button class="more-button" data-edit="${section}|${escapeHtml(item.id)}" type="button">⋯</button>
+      </div>`;
+    }
+
+    function renderList(section){ const items=getItems(section); return items.length?items.map(x=>renderItem(x,section)).join(""):`<div class="empty-state">Пока здесь ничего нет</div>`; }
+    function addButton(section){ return `<button class="add-button" data-add="${section}" type="button" aria-label="Добавить">+</button>`; }
+
+    function render(){
+      const quote=data.dailyFocus.quotes[dayIndex(data.dailyFocus.quotes.length,3)];
+      const dayQuestion=data.dailyFocus.dayQuestions[dayIndex(data.dailyFocus.dayQuestions.length,11)];
+      const nightQuestion=data.dailyFocus.nightQuestions[dayIndex(data.dailyFocus.nightQuestions.length,23)];
+      const water=data.health.water;
+      const waterProgress=Math.min(100,Math.round((state.waterMl/water.goalMl)*100));
+      const sportToday=(state.sportSelected||[]).map(id=>data.morning.sportOptions.find(x=>x.id===id)?.label).filter(Boolean).join(" · ");
+
+      root.innerHTML=`
+        <section class="hero"><div class="eyebrow">ТВОЁ ПРОСТРАНСТВО НА СЕГОДНЯ</div><h1>${escapeHtml(data.app.title)}</h1><div class="subtitle">${escapeHtml(data.app.subtitle)}</div><div class="date-pill">✦ <span>${escapeHtml(formatDate())}</span></div></section>
+        <section class="section-card focus"><div class="section-title-row"><h2 class="section-title">Фокус дня</h2><span class="section-kicker">обновляется ежедневно</span></div><p class="quote">${escapeHtml(quote)}</p><div class="question-box"><span class="question-label">Вопрос дня</span><p class="question-text">${escapeHtml(dayQuestion)}</p></div></section>
+
+        <section class="section-card"><div class="section-title-row"><h2 class="section-title">${escapeHtml(data.morning.title)}</h2><div class="section-title-actions"><span class="section-kicker">начать мягко</span>${addButton("morning")}</div></div>${renderSectionProgress("morning")}<div class="list">${renderList("morning")}</div>${sportToday?`<div class="sport-note"><b>Сегодня:</b> ${escapeHtml(sportToday)}</div>`:""}</section>
+
+        <section class="section-card"><div class="section-title-row"><h2 class="section-title">${escapeHtml(data.health.title)}</h2><div class="section-title-actions">${addButton("medications")}</div></div>
+          <div class="health-grid"><div class="water-card"><div class="mini-label">${escapeHtml(water.label)}</div><div class="water-total"><span>${state.waterMl}</span> мл</div><div class="water-goal">цель ${water.goalMl} мл</div><button class="water-button" id="addWater" type="button">+${water.stepMl} мл воды</button></div><div class="progress-card"><div class="mini-label">Прогресс воды</div><div class="ring" style="--p:${waterProgress}%"><span>${waterProgress}%</span></div><div class="progress-caption">за сегодня</div></div></div>
+          <div class="list">${renderList("medications")}</div>
+        </section>
+
+        <section class="section-card"><div class="section-title-row"><h2 class="section-title">${escapeHtml(data.plan.title)}</h2><div class="section-title-actions"><span class="section-kicker">главное на сегодня</span>${addButton("plan")}</div></div>${renderSectionProgress("plan")}<div class="list">${renderList("plan")}</div></section>
+
+        <section class="section-card"><div class="section-title-row"><h2 class="section-title">${escapeHtml(data.habits.title)}</h2><div class="section-title-actions">${addButton("habits")}</div></div><div class="list">${renderList("habits")}</div></section>
+
+        <section class="section-card"><div class="section-title-row"><h2 class="section-title">${escapeHtml(data.evening.title)}</h2><span class="section-kicker">подвести итоги</span></div>
+          <div class="money-grid">${(data.evening.moneyFields||[]).map(field=>`<label class="money-box"><span class="money-label">${escapeHtml(field.label)}</span><span class="money-input-wrap"><input class="money-input" type="number" min="0" step="1" inputmode="decimal" data-field="${escapeHtml(field.id)}" placeholder="${escapeHtml(field.placeholder)}" value="${escapeHtml(state.fields[field.id]||"")}"><span class="money-suffix">${escapeHtml(field.suffix||"")}</span></span></label>`).join("")}</div>
+          ${data.evening.fields.map(field=>`<div class="field"><label class="field-label" for="${escapeHtml(field.id)}">${escapeHtml(field.label)}</label><textarea id="${escapeHtml(field.id)}" data-field="${escapeHtml(field.id)}" placeholder="${escapeHtml(field.placeholder)}">${escapeHtml(state.fields[field.id]||"")}</textarea></div>`).join("")}<div class="night-question"><span class="question-label">Вопрос на ночь</span><p class="question-text">${escapeHtml(nightQuestion)}</p></div></section>
+        <p class="footer-note">В прототипе изменения сохраняются локально. В рабочей версии эти же действия можно связать с сервером агента.</p>`;
+      bindEvents();
+    }
+
+    function bindEvents(){
+      document.querySelectorAll("[data-toggle]").forEach(el=>el.addEventListener("click",()=>{ const [section,id]=el.dataset.toggle.split("|"); toggleItem(section,id); }));
+      document.querySelectorAll("[data-stats]").forEach(el=>el.addEventListener("click",()=>{ const [section,id]=el.dataset.stats.split("|"); openStats(section,id); }));
+      document.querySelectorAll("[data-edit]").forEach(el=>el.addEventListener("click",()=>{ const [section,id]=el.dataset.edit.split("|"); openEdit(section,id); }));
+      document.querySelectorAll("[data-add]").forEach(el=>el.addEventListener("click",()=>openAdd(el.dataset.add)));
+      document.querySelectorAll("[data-field]").forEach(el=>el.addEventListener("input",()=>{ state.fields[el.dataset.field]=el.value; saveState(); }));
+      document.getElementById("addWater")?.addEventListener("click",()=>{ state.waterMl+=data.health.water.stepMl; saveState(); render(); if(tg?.HapticFeedback) tg.HapticFeedback.impactOccurred("light"); });
+    }
+
+    function toggleItem(section,id){
+      if(section==="morning" && id==="sport"){ openSport(); return; }
+      const key=itemKey(section,id); state.checked[key]=!state.checked[key]; saveState(); render();
+      if(tg?.HapticFeedback) tg.HapticFeedback.selectionChanged();
+    }
+
+    function openModal(content){ modalSheet.innerHTML=content; modalBackdrop.classList.add("open"); modalBackdrop.setAttribute("aria-hidden","false"); modalSheet.querySelector("[data-close]")?.addEventListener("click",closeModal); }
+    function closeModal(){ modalBackdrop.classList.remove("open"); modalBackdrop.setAttribute("aria-hidden","true"); }
+    modalBackdrop.addEventListener("click",e=>{ if(e.target===modalBackdrop) closeModal(); });
+
+    function openSport(){
+      const selected=new Set(state.sportSelected||[]);
+      openModal(`<div class="sheet-head"><div class="sheet-title">Движение / спорт</div><button class="sheet-close" data-close>×</button></div><div class="sheet-note" style="margin:0 0 12px">Можно выбрать несколько вариантов за день.</div><div class="option-grid">${data.morning.sportOptions.map(o=>`<button class="option-button ${selected.has(o.id)?"selected":""}" data-sport="${o.id}" type="button">${escapeHtml(o.label)}</button>`).join("")}</div><button class="primary-button" id="saveSport">Сохранить</button>`);
+      modalSheet.querySelectorAll("[data-sport]").forEach(b=>b.addEventListener("click",()=>{ selected.has(b.dataset.sport)?selected.delete(b.dataset.sport):selected.add(b.dataset.sport); b.classList.toggle("selected"); }));
+      modalSheet.querySelector("#saveSport").addEventListener("click",()=>{ state.sportSelected=[...selected]; saveState(); closeModal(); render(); });
+    }
+
+    function openStats(section,id){
+      const item=findItem(section,id); if(!item) return;
+      const s7=statValue(item,section,7), s30=statValue(item,section,30);
+      let extra="";
+      if(section==="morning" && id==="sport"){
+        extra=`<div class="breakdown">${data.morning.sportOptions.map(o=>{ const today=(state.sportSelected||[]).includes(o.id)?1:0; return `<div class="breakdown-row"><span>${escapeHtml(o.label)}</span><b>${o.weekBase+today} / 7 · ${o.monthBase+today} / 30</b></div>`; }).join("")}</div>`;
+      }
+      openModal(`<div class="sheet-head"><div class="sheet-title">${escapeHtml(item.label)}</div><button class="sheet-close" data-close>×</button></div><div class="stats-grid"><div class="stat-card"><div class="stat-number">${s7}/7</div><div class="stat-caption">за 7 дней</div></div><div class="stat-card"><div class="stat-number">${s30}/30</div><div class="stat-caption">за 30 дней</div></div></div>${extra}`);
+    }
+
+    function sectionNoun(section){ return ({morning:"утренний ритуал",medications:"лекарство",plan:"задачу",habits:"привычку"})[section]||"пункт"; }
+
+    function openAdd(section){
+      const timeField=section==="medications"?`<label class="form-label">Время</label><input class="text-input" id="itemTime" type="time">`:"";
+      openModal(`<div class="sheet-head"><div class="sheet-title">Добавить ${sectionNoun(section)}</div><button class="sheet-close" data-close>×</button></div><label class="form-label">Название</label><input class="text-input" id="itemLabel" placeholder="Например: почитать 20 минут">${timeField}<button class="primary-button" id="saveItem">Добавить</button>`);
+      modalSheet.querySelector("#saveItem").addEventListener("click",()=>{
+        const label=modalSheet.querySelector("#itemLabel").value.trim(); if(!label) return;
+        const item={id:"custom_"+Date.now(),label,stats7Base:0,stats30Base:0};
+        if(section==="medications") item.time=modalSheet.querySelector("#itemTime").value||"";
+        if(section==="plan") state.planCustom.push(item); else config.custom[section].push(item);
+        section==="plan"?saveState():saveConfig(); closeModal(); render();
+      });
+    }
+
+    function openEdit(section,id){
+      const item=findItem(section,id); if(!item) return;
+      const timeField=section==="medications"?`<label class="form-label">Время</label><input class="text-input" id="editTime" type="time" value="${escapeHtml(item.time||"")}">`:"";
+      openModal(`<div class="sheet-head"><div class="sheet-title">Изменить пункт</div><button class="sheet-close" data-close>×</button></div><label class="form-label">Название</label><input class="text-input" id="editLabel" value="${escapeHtml(item.label)}">${timeField}<button class="primary-button" id="saveEdit">Сохранить</button><button class="danger-button" id="deleteItem">Удалить</button>`);
+      modalSheet.querySelector("#saveEdit").addEventListener("click",()=>{
+        const label=modalSheet.querySelector("#editLabel").value.trim(); if(!label) return;
+        const patch={label}; if(section==="medications") patch.time=modalSheet.querySelector("#editTime").value||"";
+        if(section==="plan"){
+          const customItem=state.planCustom.find(x=>x.id===id); if(customItem) Object.assign(customItem,patch); else state.planOverrides[id]={...(state.planOverrides[id]||{}),...patch}; saveState();
+        } else {
+          const customItem=(config.custom[section]||[]).find(x=>x.id===id); if(customItem) Object.assign(customItem,patch); else config.overrides[section+":"+id]={...(config.overrides[section+":"+id]||{}),...patch}; saveConfig();
+        }
+        closeModal(); render();
+      });
+      modalSheet.querySelector("#deleteItem").addEventListener("click",()=>{
+        if(section==="plan"){
+          const before=state.planCustom.length; state.planCustom=state.planCustom.filter(x=>x.id!==id); if(state.planCustom.length===before) state.planHidden[id]=true; saveState();
+        } else {
+          const before=(config.custom[section]||[]).length; config.custom[section]=(config.custom[section]||[]).filter(x=>x.id!==id); if(config.custom[section].length===before) config.hidden[section+":"+id]=true; saveConfig();
+        }
+        closeModal(); render();
+      });
+    }
+
+    function showLoadError(){ root.className="error-state"; root.innerHTML=`<div class="error-card"><div class="error-icon">✦</div><h2>Данные пока не загрузились</h2><p>Проверь, что <strong>data.json</strong> находится рядом с <strong>index.html</strong>, и перезапусти Mini App.</p></div>`; }
+
+    fetch("data.json?v=" + Date.now(), { cache:"no-store" })
+      .then(response=>{ if(!response.ok) throw new Error("HTTP "+response.status); return response.json(); })
+      .then(json=>{ data=json; render(); })
+      .catch(error=>{ console.error("Не удалось загрузить data.json:",error); showLoadError(); });
+
+  </script>
+</body>
+</html>
