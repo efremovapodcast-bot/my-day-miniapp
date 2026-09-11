@@ -32,26 +32,26 @@
       {
         "id": "wake",
         "label": "Встать без долгого откладывания",
-        "stats7Base": 4,
+        "stats7Base": 0,
         "stats30Base": 19
       },
       {
         "id": "water_morning",
         "label": "Стакан воды после пробуждения",
-        "stats7Base": 5,
+        "stats7Base": 0,
         "stats30Base": 23
       },
       {
         "id": "meditation",
         "label": "5–10 минут медитации",
-        "stats7Base": 3,
+        "stats7Base": 0,
         "stats30Base": 15
       },
       {
         "id": "sport",
         "label": "Движение / спорт",
         "type": "sport",
-        "stats7Base": 4,
+        "stats7Base": 0,
         "stats30Base": 17
       }
     ],
@@ -59,19 +59,19 @@
       {
         "id": "stretch",
         "label": "Растяжка",
-        "weekBase": 2,
+        "weekBase": 0,
         "monthBase": 9
       },
       {
         "id": "exercise",
         "label": "Зарядка",
-        "weekBase": 1,
+        "weekBase": 0,
         "monthBase": 5
       },
       {
         "id": "pool",
         "label": "Бассейн",
-        "weekBase": 1,
+        "weekBase": 0,
         "monthBase": 4
       },
       {
@@ -94,14 +94,14 @@
         "id": "med_morning",
         "label": "Утренние лекарства",
         "time": "10:00",
-        "stats7Base": 5,
+        "stats7Base": 0,
         "stats30Base": 24
       },
       {
         "id": "med_evening",
         "label": "Вечерние лекарства",
         "time": "21:00",
-        "stats7Base": 4,
+        "stats7Base": 0,
         "stats30Base": 22
       }
     ]
@@ -133,7 +133,7 @@
       {
         "id": "reading",
         "label": "Чтение",
-        "stats7Base": 2,
+        "stats7Base": 0,
         "stats30Base": 12
       }
     ]
